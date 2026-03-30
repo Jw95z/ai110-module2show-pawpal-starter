@@ -1,28 +1,56 @@
+from datetime import date
+
 from pawpal_system import Owner, Pet, Task, Scheduler
 
 
 def main() -> None:
     owner = Owner("Jordan")
 
-    dog = Pet(name="Mochi", species="dog", age=3)
-    cat = Pet(name="Luna", species="cat", age=5)
+    mochi = Pet(name="Mochi", species="dog", age=3)
+    luna = Pet(name="Luna", species="cat", age=5)
 
-    dog.add_task(Task(description="Morning walk", time="08:00", frequency="daily"))
-    dog.add_task(Task(description="Breakfast", time="08:30", frequency="daily"))
-    cat.add_task(Task(description="Feed dinner", time="18:00", frequency="daily"))
-    cat.add_task(Task(description="Brush fur", time="19:00", frequency="weekly"))
+    today = date.today()
 
-    owner.add_pet(dog)
-    owner.add_pet(cat)
+    # Add tasks out of order on purpose
+    mochi.add_task(Task("Breakfast", "08:30", "daily", today))
+    mochi.add_task(Task("Morning walk", "07:30", "daily", today))
+    luna.add_task(Task("Feed dinner", "18:00", "daily", today))
+    luna.add_task(Task("Brush fur", "18:00", "weekly", today))
+    mochi.add_task(Task("Medication", "18:00", "daily", today))
+
+    owner.add_pet(mochi)
+    owner.add_pet(luna)
 
     scheduler = Scheduler(owner)
 
-    print(scheduler.format_schedule())
+    print("\nFULL SCHEDULE")
+    print(scheduler.format_schedule(scheduler.sort_by_time(owner.get_all_tasks())))
 
-    print("\nMarking Mochi's Morning walk as complete...\n")
-    scheduler.mark_task_complete("Mochi", "Morning walk", "08:00")
+    print("\nONLY MOCHI'S TASKS")
+    mochi_tasks = scheduler.filter_tasks(pet_name="Mochi")
+    print(scheduler.format_schedule(mochi_tasks))
 
-    print(scheduler.format_schedule())
+    print("\nONLY PENDING TASKS")
+    pending_tasks = scheduler.filter_tasks(completed=False)
+    print(scheduler.format_schedule(pending_tasks))
+
+    print("\nCONFLICT WARNINGS")
+    warnings = scheduler.detect_conflicts()
+    if warnings:
+        for warning in warnings:
+            print("-", warning)
+    else:
+        print("No conflicts detected.")
+
+    print("\nMARKING MOCHI'S MORNING WALK COMPLETE...")
+    scheduler.mark_task_complete("Mochi", "Morning walk", "07:30")
+
+    print("\nTODAY'S PENDING SCHEDULE AFTER COMPLETION")
+    print(scheduler.format_schedule(scheduler.get_todays_schedule(pending_only=True)))
+
+    print("\nALL MOCHI TASKS AFTER RECURRING TASK RECREATION")
+    mochi_tasks = scheduler.filter_tasks(pet_name="Mochi")
+    print(scheduler.format_schedule(mochi_tasks))
 
 
 if __name__ == "__main__":

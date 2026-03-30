@@ -32,8 +32,7 @@
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+- I used AI to help translate my UML design into actual Python classes and method structures. It was especially helpful for checking relationships between classes and for drafting small test cases. I still reviewed the code carefully and made sure the final design matched the project requirements instead of accepting every suggestion automatically.
 
 **b. Judgment and verification**
 
